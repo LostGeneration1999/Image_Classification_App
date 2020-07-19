@@ -2,7 +2,11 @@
 <template>
   <div>
     <p>Home</p>
-    <button @click="getRandom">占う</button>
+    <button @click="getRandom">その画像、判定してやんよ</button>
+    <label>
+      画像を選択
+      <input  type='file' placeholder='判定画像を入力してください'/>
+    </label>
     <p>Random number from backend: {{ randomNum }}</p>
     <h1 v-if="randomNum%4==0">Awesome!!!</h1>
     <h2 v-if="randomNum%4==1">Good</h2>
@@ -18,7 +22,13 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      randomNum: 0
+      randomNum: 0,
+      productForm: {
+        image: {
+          photo: null
+        }
+      },
+      photoURL: ''
     }
   },
   methods: {
@@ -34,6 +44,11 @@ export default {
         .catch(error => {
           console.log(error)
         })
+    },
+    onFileChange (e) {
+      const file = e.target.files[0]
+      this.productForm.image.photo = file
+      this.photoURL = URL.createObjectURL(file)
     }
   },
   created () {
