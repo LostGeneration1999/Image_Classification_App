@@ -1,34 +1,25 @@
 <!-- HTMLを記述 -->
 <template>
   <div>
-    <p>Home</p>
-    <button @click="getRandom">その画像、判定してやんよ</button>
-    <label>
-      画像を選択
-      <input  type='file' placeholder='判定画像を入力してください'/>
-    </label>
-    <p>Random number from backend: {{ randomNum }}</p>
-    <h1 v-if="randomNum%4==0">Awesome!!!</h1>
-    <h2 v-if="randomNum%4==1">Good</h2>
-    <h2 v-if="randomNum%4==2">Bad...</h2>
-    <h1 v-if="randomNum%4==3">S〇〇ks!!!</h1>
+    <div class="imgContent">
+      <div class="imagePreview">
+        <img :src="uploadedImage" style="width:100%;" />
+      </div>
+      <input type="file" class="file_input" name="photo" @change="onFileChange"  accept="image/*" />
+      <button @click='onUploadImage'>画像判定してクレメンス・・・</button>
+    </div>
   </div>
 </template>
 
 <!-- JavaScriptを記述 -->
 <script>
 import axios from 'axios'
-
+const API_URL = 'http://127.0.0.1:5000'
 export default {
   data () {
     return {
       randomNum: 0,
-      productForm: {
-        image: {
-          photo: null
-        }
-      },
-      photoURL: ''
+      uploadedImage: ''
     }
   },
   methods: {
@@ -36,24 +27,65 @@ export default {
       this.randomNum = this.getRandomNum()
     },
     getRandomNum () {
-      const path = 'http://localhost:5000/rand'
-      axios.get(path)
-        .then(response => {
-          this.randomNum = response.data.randomNum
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      return axios.get(API_URL)
     },
     onFileChange (e) {
-      const file = e.target.files[0]
-      this.productForm.image.photo = file
-      this.photoURL = URL.createObjectURL(file)
+      let files = e.target.files || e.dataTransfer.files
+      this.createImage(files[0])
+    },
+    // アップロードした画像を表示
+    createImage (file) {
+      let reader = new FileReader()
+      reader.onload = (e) => {
+        this.uploadedImage = e.target.result
+      }
+      reader.readAsDataURL(file)
+    },
+    removeImage (e) {
+      this.uploadedImage = ''
+    },
+    onUploadImage () {
+      var params = new FormData()
+      params.append('image', this.uploadedImage)
+      axios.post(`${API_URL}/rand`, params).then(function (response) {
+        console.log(response.data)
+      })
+    },
+    created () {
+      this.getRandom()
     }
-  },
-  created () {
-    this.getRandom()
   }
 }
+
 </script>
-<!--一行空行を入れてください-->
+
+<style scoped>
+.imgContent {
+  width: 90%;
+  max-width: 50%;
+  margin:auto;
+  margin-bottom:40px;
+}
+.imagePreview {
+  height:80vh;
+  background: rgb(240, 240, 240);
+  overflow:hidden;
+  border-radius: 10px;
+  background-position: center center;
+  background-size: cover;
+  margin-bottom:30px;
+  position: relative;
+  }
+ .fileUpload {
+  text-align: center;
+  position: absolute;
+  height: 25px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  color:rgb(134, 134, 134);
+  padding: 20px;
+}
+</style>

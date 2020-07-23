@@ -14,19 +14,19 @@ app.config.from_object(__name__)
 
 CORS(app)
 
+
 # 任意のリクエストを受け取った時、index.htmlを参照
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch(path):
     return render_template("index.html")
 
-# '/rand'が叩かれた時、乱数を生成
-@app.route('/rand')
+# '/rand'が叩かれた時、画像名を生成
+@app.route('/rand', methods=['POST'])
 def random():
-    response = {
-        'randomNum': randint(1,100)
-    }
-    return jsonify(response)
+    img = request.files['image']
+    name = img.filename
+    return jsonify(name)
 
 # app.run(host, port)：hostとportを指定してflaskサーバを起動
 if __name__ == '__main__':
