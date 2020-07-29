@@ -6,8 +6,14 @@
         <img :src="uploadedImage" style="width:100%;" />
       </div>
       <input type="file" class="file_input" name="photo" @change="onFileChange"  accept="image/*" />
-      <button @click='onUploadImage'>画像判定してクレメンス・・・</button>
+      <button @click='onUploadImage'>画像判定してくだちい・・・</button>
     </div>
+    <!-- <button @click='getDaisukeMiura'>test</button> -->
+    <!-- <div>
+      <span>選手名：{{ playerData.name }}</span>
+      <span>球団名：{{ playerData.team }}</span>
+      <span>応援歌：{{ playerData.song }}</span>
+    </div> -->
   </div>
 </template>
 
@@ -18,16 +24,13 @@ const API_URL = 'http://127.0.0.1:5000'
 export default {
   data () {
     return {
-      randomNum: 0,
+      playerData: {},
       uploadedImage: ''
     }
   },
   methods: {
-    getRandom () {
-      this.randomNum = this.getRandomNum()
-    },
-    getRandomNum () {
-      return axios.get(API_URL)
+    getDaisukeMiura () {
+      axios.get(`${API_URL}/api/spam`).then(response => (this.playerData = response.data))
     },
     onFileChange (e) {
       let files = e.target.files || e.dataTransfer.files
@@ -46,13 +49,12 @@ export default {
     },
     onUploadImage () {
       var params = new FormData()
+      console.log(this.uploadedImage)
       params.append('image', this.uploadedImage)
-      axios.post(`${API_URL}/rand`, params).then(function (response) {
-        console.log(response.data)
+      console.log(params)
+      axios.post(`${API_URL}/classification`, params).then(function (response) {
+        console.log(response)
       })
-    },
-    created () {
-      this.getRandom()
     }
   }
 }
